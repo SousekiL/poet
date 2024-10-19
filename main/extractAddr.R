@@ -31,6 +31,7 @@ sheet_names <- getSheetNames(file_path)
 # 整理数据
 poem_df <- data.frame(
   name = character(),
+  order = numeric(),
   addr = character(),
   ex_addr = character(),
   cm_addr = character()
@@ -56,6 +57,7 @@ for (i in sheet_names) {
   # 创建数据框
   .df <- data.frame(
     name = i,
+    order = 1:length(split_locations[, 1]),
     addr = split_locations[, 1],
     ex_addr = split_locations[, 2],
     cm_addr = split_locations[, 3],
