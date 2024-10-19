@@ -61,12 +61,14 @@ print(provincial_shape)
 
 # 创建南海九段线的小图
 south_china_sea_plot <- ggplot() +
-  geom_sf(data = provincial_shape, fill = "white", color = "gray20") + # 绘制省级区域
+  geom_sf(data = provincial_shape, fill = "#EDDBC9", color = "gray20") + # 绘制省级区域
   geom_sf(data = sea_line, color = "black", size = 1) +
-  coord_sf(xlim = st_bbox(sea_line)[c("xmin", "xmax")], 
-           ylim = st_bbox(sea_line)[c("ymin", "ymax")], 
-           expand = FALSE) +
-  theme_void() 
+  coord_sf(
+    xlim = st_bbox(sea_line)[c("xmin", "xmax")],
+    ylim = st_bbox(sea_line)[c("ymin", "ymax")],
+    expand = FALSE
+  ) +
+  theme_void()
 
 # 将小图转换为可用的 grob 对象
 inset_grob <- ggplotGrob(south_china_sea_plot)
@@ -93,7 +95,7 @@ capital_addr <- poem_addr_df_sf %>%
 for (poetry_name in unique(poem_addr_df_sf$id)) {
   case_proj <- poem_addr_df_sf %>%
     dplyr::filter(id == poetry_name)
-  
+
   # 使用 ggplot2 绘制点和曲线
   # 获取每个组的第一个和最后一个点
   first_last_points <- case_proj %>%
@@ -103,7 +105,7 @@ for (poetry_name in unique(poem_addr_df_sf$id)) {
     ungroup()
   # 作图
   ggplot() +
-    geom_sf(data = provincial_shape, fill = "white", color = "gray20") + # 绘制省级区域
+    geom_sf(data = provincial_shape, fill = "#EDDBC9", color = "gray20", alpha = .7) + # 绘制省级区域
     geom_sf(data = sea_line, color = "black", size = 1) + # 绘制九段线
     geom_sf(data = case_proj, aes(color = name), size = 2, alpha = .5, color = "#F97A71") + # 绘制点
     geom_curve(
@@ -124,55 +126,94 @@ for (poetry_name in unique(poem_addr_df_sf$id)) {
       arrow = arrow(type = "open", length = unit(0.2, "cm"))
     ) +
     ## 都城
-    geom_point(data = capital_addr,
-               aes(x = st_coordinates(geometry)[, 1],
-                   y = st_coordinates(geometry)[, 2]), # 通过order判断颜色
-               size = 3,
-               shape = 17) + # 都城
-    geom_label_repel(data = capital_addr,
-                     aes(x = st_coordinates(geometry)[, 1],
-                         y = st_coordinates(geometry)[, 2],
-                         label = addr),
-                     color = "black",
-                     box.padding = 0.3,
-                     point.padding = 0.5,
-                     segment.color = 'grey50',
-                     family = "Canger",
-                     fontface = "bold",
-                     size = 10) + # 都城
+    geom_point(
+      data = capital_addr,
+      aes(
+        x = st_coordinates(geometry)[, 1],
+        y = st_coordinates(geometry)[, 2]
+      ), # 通过order判断颜色
+      size = 3,
+      shape = 17
+    ) + # 都城
+    geom_label_repel(
+      data = capital_addr,
+      aes(
+        x = st_coordinates(geometry)[, 1],
+        y = st_coordinates(geometry)[, 2],
+        label = addr
+      ),
+      color = "black",
+      box.padding = 0.3,
+      point.padding = 0.5,
+      segment.color = "grey50",
+      family = "Canger",
+      fontface = "bold",
+      alpha = .7,
+      size = 10
+    ) + 
     ## 生卒地
-    geom_point(data = first_last_points,
-               aes(x = st_coordinates(geometry)[, 1],
-                   y = st_coordinates(geometry)[, 2],
-                   color = factor(order == min(order), labels = c("去世", "出生"))), # 通过order判断颜色
-               size = 3) + # 增加点的大小以突出显示
-    geom_label_repel(data = first_last_points,
-                     aes(x = st_coordinates(geometry)[, 1],
-                         y = st_coordinates(geometry)[, 2],
-                         label = cm_addr,
-                         color = factor(order == min(order), labels = c("去世", "出生"))),
-                     box.padding = 0.3,
-                     point.padding = 0.5,
-                     segment.color = 'grey50',
-                     family = "Canger",
-                     fontface = "bold",
-                     size = 12) + # 设置标签字体大小
-    coord_sf(xlim = st_bbox(bbox_shape)[c("xmin", "xmax")] - c(-500000, 500000), 
-             ylim = st_bbox(bbox_shape)[c("ymin", "ymax")] - c(0, 500000), 
-             expand = FALSE) +
+    geom_point(
+      data = first_last_points,
+      aes(
+        x = st_coordinates(geometry)[, 1],
+        y = st_coordinates(geometry)[, 2],
+        color = factor(order == min(order), labels = c("去世", "出生"))
+      ), # 通过order判断颜色
+      size = 3
+    ) + # 增加点的大小以突出显示
+    geom_label_repel(
+      data = first_last_points,
+      aes(
+        x = st_coordinates(geometry)[, 1],
+        y = st_coordinates(geometry)[, 2],
+        label = cm_addr,
+        color = factor(order == min(order), labels = c("去世", "出生"))
+      ),
+      box.padding = 0.3,
+      point.padding = 0.5,
+      segment.color = "grey50",
+      family = "Canger",
+      fontface = "bold",
+      alpha = .9,
+      size = 12
+    ) + # 设置标签字体大小
+    coord_sf(
+      xlim = st_bbox(bbox_shape)[c("xmin", "xmax")] - c(-500000, 500000),
+      ylim = st_bbox(bbox_shape)[c("ymin", "ymax")] - c(0, 500000),
+      expand = FALSE
+    ) +
     theme_bw() +
     labs(
       title = paste0(unique(case_proj$name), " 编年地图"),
       x = "", y = ""
     ) +
-    theme(text = element_text(family = "Canger", size = 30),
-          title = element_text(family = "Canger", size = 50),
-          legend.position = c(0.2, 0.2)) +
-    scale_color_manual(values = c("出生" = "#E6700B", "去世" = "#1A3DA3"), 
-                       labels = c("出生" = "出生(或最早见于)", "去世" = "去世(或最后见于)"), 
-                       name = "生卒地",
-                       limits = c("出生", "去世")) + # 设置图例和颜色
-    guides(color = guide_legend(override.aes = list(size = 10)))  +
+    theme(
+      text = element_text(family = "Canger", size = 35),
+      title = element_text(family = "Canger", size = 60),
+      legend.position = c(0.2, 0.2),
+      # old map
+      panel.background = element_rect(fill = "#f7f4e9", color = NA), # antique paper color
+      plot.background = element_rect(fill = "#f7f4e9", color = NA),
+      panel.border = element_rect(color = "#c1a184", size = 1.2), # soft brown border
+      panel.grid.major = element_line(color = "#d3c2a3", size = 0.2), # light grid lines
+      panel.grid.minor = element_blank(),
+      axis.ticks = element_line(color = "#c1a184"),
+      axis.text = element_text(color = "#4a3f2f"), # brown axis labels
+      axis.title = element_text(color = "#4a3f2f"),
+      plot.title = element_text(color = "#4a3f2f"),
+      plot.subtitle = element_text(color = "#4a3f2f"),
+      legend.background = element_rect(fill = "transparent", color = NA),
+      legend.text = element_text(color = "#4a3f2f", family = "Canger", size = 35),
+      legend.title = element_text(color = "#4a3f2f", family = "Canger", size = 45),
+      legend.key = element_rect(fill = "transparent", color = NA)
+    ) +
+    scale_color_manual(
+      values = c("出生" = "#E6700B", "去世" = "#1A3DA3"),
+      labels = c("出生" = "出生(或最早见于)", "去世" = "去世(或最后见于)"),
+      name = "生卒地",
+      limits = c("出生", "去世")
+    ) + # 设置图例和颜色
+    guides(color = guide_legend(override.aes = list(size = 10))) +
     annotation_custom(
       inset_with_border,
       xmin = st_bbox(bbox_shape)["xmax"] - 500000 - 700000, # 调整位置
@@ -180,14 +221,11 @@ for (poetry_name in unique(poem_addr_df_sf$id)) {
       ymin = st_bbox(bbox_shape)["ymin"] + 100000,
       ymax = st_bbox(bbox_shape)["ymin"] + 950000
     )
-  
-  ggsave(paste0("plot/", poetry_name, "_plot.png"), 
-         width = 10, height = 8, 
-         dpi = 300)
-  
+
+  ggsave(paste0("plot/", poetry_name, "_plot.png"),
+    width = 10, height = 8,
+    dpi = 300
+  )
+
   print(poetry_name)
 }
-
-
-
-
