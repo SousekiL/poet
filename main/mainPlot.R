@@ -14,6 +14,10 @@ font_add("Canger", "/Library/Fonts/仓耳今楷01-W04.ttf")
 font_families()
 
 showtext_auto() # 全局自动使用
+
+## load data
+load("poem_addr_df.RData")
+
 # 读取 shapefile 文件
 shapefile_path <- "/Users/sousekilyu/Documents/Meta Data/MAP/2023年10月14日版（CTAmap 1.12）/2023年/2023年省级/2023年省级.shp"
 provincial_shape <- st_read(shapefile_path, crs = 4326) %>%

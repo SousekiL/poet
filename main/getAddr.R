@@ -55,3 +55,6 @@ location_df$search_addr <- rownames(location_df)
 # 合并数据
 poem_addr_df <- left_join(poem_df2, location_df) %>%
   dplyr::mutate(id = str_trim(str_replace(name, "\\(.*?\\)", "")))
+
+save(poem_addr_df,
+     file = "poem_addr_df.RData")
