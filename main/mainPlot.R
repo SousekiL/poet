@@ -89,6 +89,66 @@ capital_addr <- poem_addr_df_sf %>%
   mutate(addr = ifelse(addr == "西安", "长安", addr)) %>%
   unique()
 
+## map风格
+default_bg_color = "#f5f5f2"
+default_font_family = "Canger"
+default_font_color = "#22211d"
+default_font_size = 35
+default_sub_title_font_size = 45
+default_title_font_size = 60
+
+theme_map <- function(...) {
+  theme_minimal() +
+    theme(
+      # remove all axes
+      axis.line = element_blank(),
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      # add a subtle grid
+      panel.grid.major = element_line(color = "#dbdbd9", size = 0.2),
+      panel.grid.minor = element_blank(),
+      # background colors
+      plot.background = element_rect(fill = default_bg_color,
+                                     color = NA),
+      panel.background = element_rect(fill = default_bg_color,
+                                      color = NA),
+      legend.background = element_rect(fill = default_bg_color,
+                                       color = NA),
+      # borders and margins
+      plot.margin = unit(c(.5, .5, .2, .5), "cm"),
+      panel.border = element_blank(),
+      panel.spacing = unit(c(-.1, 0.2, .2, 0.2), "cm"),
+      # titles
+      title = element_text(family = default_font_family, 
+                           color = default_font_color,
+                           size = default_title_font_size),
+      legend.title = element_text(family = default_font_family, 
+                                  size = default_sub_title_font_size),
+      legend.text = element_text(hjust = 0,
+                                 color = default_font_color,
+                                 family = default_font_family, 
+                                 size = default_font_size),
+      legend.position = c(0.2, 0.2),
+      plot.title = element_text(size = default_title_font_size, hjust = 0.5,
+                                color = default_font_color),
+      plot.subtitle = element_text(size = default_sub_title_font_size, hjust = 0.5,
+                                   color = default_font_color,
+                                   margin = margin(b = -0.1,
+                                                   t = 0.1,
+                                                   l = 2,
+                                                   unit = "cm"),
+                                   debug = F),
+      # captions
+      plot.caption = element_text(size = default_font_size,
+                                  hjust = .5,
+                                  margin = margin(t = 0.2,
+                                                  b = 0,
+                                                  unit = "cm"),
+                                  color = "#939184"),
+      ...
+    )
+}
 
 # for
 
@@ -184,32 +244,35 @@ for (poetry_name in unique(poem_addr_df_sf$id)) {
     ) +
     theme_bw() +
     labs(
-      title = paste0(unique(case_proj$name), " 编年地图"),
-      x = "", y = ""
+      title = "唐朝文人编年地图",
+      subtitle = unique(case_proj$name),
+      x = "", y = "",
+      caption = "数据来源：唐宋文学编年地图(https://cnkgraph.com/Map/PoetLife)"
     ) +
-    theme(
-      text = element_text(family = "Canger", size = 35),
-      title = element_text(family = "Canger", size = 60),
-      legend.position = c(0.2, 0.2),
-      # old map
-      panel.background = element_rect(fill = "#f7f4e9", color = NA), # antique paper color
-      plot.background = element_rect(fill = "#f7f4e9", color = NA),
-      panel.border = element_rect(color = "#c1a184", size = 1.2), # soft brown border
-      panel.grid.major = element_line(color = "#d3c2a3", size = 0.2), # light grid lines
-      panel.grid.minor = element_blank(),
-      axis.ticks = element_line(color = "#c1a184"),
-      axis.text = element_text(color = "#4a3f2f"), # brown axis labels
-      axis.title = element_text(color = "#4a3f2f"),
-      plot.title = element_text(color = "#4a3f2f"),
-      plot.subtitle = element_text(color = "#4a3f2f"),
-      legend.background = element_rect(fill = "transparent", color = NA),
-      legend.text = element_text(color = "#4a3f2f", family = "Canger", size = 35),
-      legend.title = element_text(color = "#4a3f2f", family = "Canger", size = 45),
-      legend.key = element_rect(fill = "transparent", color = NA)
-    ) +
+    # theme(
+    #   text = element_text(family = "Canger", size = 35),
+    #   title = element_text(family = "Canger", size = 60),
+    #   legend.position = c(0.2, 0.2)
+    #   # old map
+    #   panel.background = element_rect(fill = "#f7f4e9", color = NA), # antique paper color
+    #   plot.background = element_rect(fill = "#f7f4e9", color = NA),
+    #   panel.border = element_rect(color = "#c1a184", size = 1.2), # soft brown border
+    #   panel.grid.major = element_line(color = "#d3c2a3", size = 0.2), # light grid lines
+    #   panel.grid.minor = element_blank(),
+    #   axis.ticks = element_line(color = "#c1a184"),
+    #   axis.text = element_text(color = "#4a3f2f"), # brown axis labels
+    #   axis.title = element_text(color = "#4a3f2f"),
+    #   plot.title = element_text(color = "#4a3f2f"),
+    #   plot.subtitle = element_text(color = "#4a3f2f"),
+    #   legend.background = element_rect(fill = "transparent", color = NA),
+    #   legend.text = element_text(color = "#4a3f2f", family = "Canger", size = 35),
+    #   legend.title = element_text(color = "#4a3f2f", family = "Canger", size = 45),
+    #   legend.key = element_rect(fill = "transparent", color = NA)
+    # ) +
+    theme_map() +
     scale_color_manual(
       values = c("出生" = "#E6700B", "去世" = "#1A3DA3"),
-      labels = c("出生" = "出生(或最早见于)", "去世" = "去世(或最后见于)"),
+      labels = c("出生" = "出生(或首次见于)", "去世" = "去世(或最后见于)"),
       name = "生卒地",
       limits = c("出生", "去世")
     ) + # 设置图例和颜色
